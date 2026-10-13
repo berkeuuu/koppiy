@@ -1,0 +1,55 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    // Kod paketi eski adda kaldı, uygulama kimliği (applicationId) yeni.
+    namespace 'com.ekrankopya.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.koppiy.app"
+        minSdk 24
+        targetSdk 34
+        versionCode 4
+        versionName "1.3"
+    }
+
+    // İmza anahtarı depoda DEĞİL: GitHub Secrets'tan derleme sırasında app/koppiy.keystore
+    // olarak yazılır. Anahtar ya da şifre yoksa (örn. biri depoyu kendi çatalladıysa)
+    // Android'in varsayılan debug imzasıyla derlenir, derleme yine de çalışır.
+    def ksFile = file('koppiy.keystore')
+    def ksPass = System.getenv('KEYSTORE_PASSWORD')
+    def hasKey = ksFile.exists() && ksPass != null && !ksPass.isEmpty()
+
+    if (hasKey) {
+        signingConfigs {
+            koppiy {
+                storeFile ksFile
+                storePassword ksPass
+                keyAlias 'koppiy'
+                keyPassword ksPass
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            if (hasKey) {
+                signingConfig signingConfigs.koppiy
+            }
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Koppiy</string>
+    <string name="service_desc">Koppiy, ekranda görünen yazıları okuyup kopyalamanı sağlar. Ekran görüntüsü almaz, internete bağlanmaz.</string>
+
+    <string name="switch_on">Açık</string>
+    <string name="switch_off">Kapalı</string>
+
+    <string name="btn_select_all">Tümü</string>
+    <string name="btn_deselect_all">Temizle</string>
+    <string name="btn_copy">Kopyala</string>
+    <string name="btn_close">Kapat</string>
+    <string name="btn_edit">Düzenle</string>
+    <string name="btn_split">Böl</string>
+    <string name="btn_back">Geri</string>
+    <string name="btn_cancel">İptal</string>
+    <string name="split_hint">Kopyalamak istediğin parçalara dokun</string>
+
+    <string name="toast_no_app">Önce bir uygulamayı aç</string>
+    <string name="toast_app_hidden">Koppiy bu uygulamada gizli</string>
+    <string name="toast_select_first">Önce bir yazı seç</string>
+    <string name="toast_copied">Kopyalandı</string>
+    <string name="toast_no_text">Bu ekranda kopyalanabilir yazı bulunamadı</string>
+    <string name="toast_read_fail">Ekran okunamadı, tekrar dene</string>
+    <string name="toast_service_off">Koppiy çalışmıyor. Uygulamayı açıp erişilebilirlik iznini ver.</string>
+    <string name="toast_switch_off">Koppiy kapalı. Uygulamadan sağ üstteki anahtarı aç.</string>
+    <string name="copied_label">Kopyalandı</string>
+
+    <string name="tab_main">Ana</string>
+    <string name="tab_settings">Ayarlar</string>
+
+    <string name="warn_stuck_title">Koppiy çalışmıyor görünüyor</string>
+    <string name="warn_stuck_text">Erişilebilirlik listesinde Koppiy açık ama servis çalışmıyor. Çözmek için erişilebilirlikte Koppiy\'yi kapatıp tekrar aç.</string>
+    <string name="btn_fix">Düzelt</string>
+
+    <string name="wizard_title">Kurulum</string>
+    <string name="wizard_progress">%1$d adımın %2$s tamam</string>
+    <string name="wizard_all_done">Her şey hazır!</string>
+    <string name="wizard_protect">Kurulum sırasında Play Protect engellerse: Play Store → sağ üstte profil → Play Protect → dişli simgesi → \"Uygulamaları Play Protect ile tara\" seçeneğini kapat, Koppiy\'yi kur, sonra tekrar aç.</string>
+    <string name="btn_open">Aç</string>
+    <string name="btn_done">Yaptım</string>
+    <string name="step_done_mark">✓ Tamam</string>
+    <string name="optional">(isteğe bağlı)</string>
+
+    <string name="step_restricted_title">Kısıtlanmış ayarlara izin ver</string>
+    <string name="step_restricted_text">Android 13 ve üstünde internet dışından kurulan uygulamalar erişilebilirliği açamaz. \"Aç\"a basınca uygulama bilgisi açılır: sağ üstteki ⋮ (üç nokta) → \"Kısıtlanmış ayarlara izin ver\" de. Sonra geri dön.</string>
+    <string name="step_access_title">Erişilebilirliği aç</string>
+    <string name="step_access_text">\"Aç\"a bas, listeden Koppiy\'yi seç ve aç. Geri dönünce bu adım kendiliğinden işaretlenir.</string>
+    <string name="step_battery_title">Pil kısıtlamasını kaldır</string>
+    <string name="step_battery_text">\"Aç\"a bas, listeden Koppiy\'yi bul ve \"Kısıtlama yok\" / \"Optimize etme\" yap. Böylece Android Koppiy\'yi arka planda kapatmaz.</string>
+    <string name="step_autostart_title">Otomatik başlatmaya izin ver</string>
+    <string name="step_autostart_text">Telefonun markası uygulamaları arka planda kapatabiliyor. \"Aç\"a bas ve Koppiy için otomatik başlatmayı aç. Bulamazsan Ayarlar → Uygulamalar → Koppiy → Otomatik başlat yolunu dene.</string>
+    <string name="step_assist_title">Orta tuşa basılı tutunca aç</string>
+    <string name="step_assist_text">\"Aç\"a bas, \"Dijital asistan uygulaması\"nı bul ve Koppiy\'yi seç. Ana ekran tuşuna basılı tutunca Koppiy açılır.</string>
+    <string name="step_lock_title">Son uygulamalarda kilitle</string>
+    <string name="step_lock_text">Son uygulamalar ekranını aç, Koppiy kartına basılı tut (ya da kartın üstündeki simgeye dokun) ve \"Kilitle\" seç. Temizle tuşuna basınca da kapanmaz.</string>
+
+    <string name="help_title">Nasıl kullanılır?</string>
+    <string name="help_text">Ekranda yazı kopyalamak istediğin yerde logo düğmesine dokun (ya da orta tuşa basılı tut). Yazıların etrafında kutular çıkar: kopyalamak istediklerine dokun, sonra Kopyala\'ya bas. Tümü hepsini seçer, Düzenle metni değiştirmeni sağlar.</string>
+    <string name="tile_title">Hızlı ayar kutucuğu</string>
+    <string name="tile_text">Bildirim panelini aşağı çek → kalem (düzenle) simgesi → \"Koppiy\" kutucuğunu üst kısma sürükle. Böylece Koppiy\'yi tek dokunuşla açıp kapatabilirsin.</string>
+
+    <string name="set_display">Görünüm</string>
+    <string name="set_size">Düğme boyutu</string>
+    <string name="set_alpha">Boştayken saydamlık</string>
+    <string name="set_theme">Tema</string>
+    <string name="theme_dark">Koyu</string>
+    <string name="theme_purple">Mor</string>
+    <string name="theme_light">Parlak</string>
+    <string name="theme_auto">Otomatik (gündüz parlak, gece koyu)</string>
+    <string name="set_behavior">Davranış</string>
+    <string name="set_mode">Koppiy nasıl açılsın?</string>
+    <string name="mode_bubble">Logo düğmesi</string>
+    <string name="mode_assist">Orta tuşa basılı tutma</string>
+    <string name="mode_both">İkisi de</string>
+    <string name="set_haptic">Titreşim</string>
+    <string name="set_snap">Düğme kenara yapışsın</string>
+    <string name="set_hide_games">Oyunlarda otomatik gizle</string>
+    <string name="set_split">Böl düğmesini göster</string>
+    <string name="set_fast">Seri mod (dokununca hemen kopyala)</string>
+    <string name="set_all_desc">Simge açıklamalarını da göster</string>
+    <string name="set_hidden">Gizlenen uygulamalar</string>
+    <string name="set_hidden_hint">Logo düğmesine basılı tutarak o an açık uygulamada Koppiy\'yi gizleyebilirsin.</string>
+    <string name="set_hidden_none">Henüz gizlenen uygulama yok</string>
+    <string name="btn_remove">Kaldır</string>
+
+    <string name="first_title">Koppiy nasıl açılsın?</string>
+    <string name="first_mode_bubble">Logo düğmesi</string>
+    <string name="first_mode_assist">Orta tuşa basılı tutma</string>
+    <string name="first_mode_both">İkisi de</string>
+
+    <string name="edit_title">Metni düzenle</string>
+    <string name="tile_label">Koppiy</string>
+</resources>
