@@ -200,54 +200,43 @@ final class BarcodeRunner {
             return sb.toString();
         }
 
-        private void codesIn(Rec r, Set<String> out) {
-            for (String s : new String[]{r.text, r.desc}) {
-                if (s == null) {
+        /**
+         * Barkodun bulunduğu kartın içindeki düğüm sayısı. Okutulmuş kartta tik işareti ek düğüm
+         * olarak eklenir, bu yüzden diğerlerinden fazla çıkar. Kart bulunamazsa -1.
+         */
+        int cardNodes(Found f) {
+            Rect t = f.rec.b;
+            Rec card = null;
+            long area = Long.MAX_VALUE;
+            for (Rec r : all) {
+                if (r == f.rec || !r.visible || r.scroll || r.cls.contains("TextView")) {
                     continue;
                 }
-                Matcher m = BARCODE.matcher(s);
-                while (m.find()) {
-                    out.add(m.group());
+                if (r.b.contains(t) && r.b.height() >= t.height() * 2) {
+                    long a = (long) r.b.width() * r.b.height();
+                    if (a < area) {
+                        area = a;
+                        card = r;
+                    }
                 }
             }
-            for (Rec c : r.children) {
-                codesIn(c, out);
+            if (card == null) {
+                return -1;
             }
-        }
-
-        private boolean hasSignal(Rec r) {
-            if (r.checked || r.selected) {
-                return true;
-            }
-            String l = r.all();
-            String[] kw = {"tamam", "okundu", "okutuldu", "onay", "check", "done"};
-            for (String k : kw) {
-                if (l.contains(k)) {
-                    return true;
+            // Sadece en üst düzey görsel öğeleri say (simge, tik); iç içe grup/yol düğümlerini sayma.
+            // Merkez noktası kartın içinde olan öğe karta ait sayılır (sınırlar taşabildiği için).
+            int n = 0;
+            for (Rec r : all) {
+                if (r == card || r == f.rec || r.cls.contains("TextView") || r.cls.contains("GroupView")
+                        || r.cls.contains("PathView") || r.cls.contains("ViewGroup")
+                        || r.cls.contains("ScrollView")) {
+                    continue;
+                }
+                if (card.b.contains(r.b.centerX(), r.b.centerY())) {
+                    n++;
                 }
             }
-            for (Rec c : r.children) {
-                if (hasSignal(c)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        /** Kartta "okutuldu" işareti (tik) görünüyor mu? Sadece tek barkod içeren kapsayıcılara bakar. */
-        boolean scanned(Found f) {
-            Rec a = f.rec;
-            for (int lvl = 0; lvl < 4 && a != null; lvl++, a = a.parent) {
-                Set<String> codes = new HashSet<>();
-                codesIn(a, codes);
-                if (codes.size() > 1) {
-                    break;
-                }
-                if (hasSignal(a)) {
-                    return true;
-                }
-            }
-            return false;
+            return n;
         }
 
         Rec findEdit() {
@@ -286,9 +275,10 @@ final class BarcodeRunner {
             return best;
         }
 
-        boolean hasText(String sub) {
+        /** Ekranda şu an GÖRÜNEN bir düğümde bu yazı var mı? (Gizli düğümler sayılmaz.) */
+        boolean hasVisibleText(String sub) {
             for (Rec r : all) {
-                if (r.all().contains(sub)) {
+                if (r.visible && r.all().contains(sub)) {
                     return true;
                 }
             }
@@ -313,14 +303,12 @@ final class BarcodeRunner {
             return best;
         }
 
+        /** Ekranda görünen yazılar (iç kimlik gibi açıklamalar hariç). */
         Set<String> labels() {
             Set<String> out = new HashSet<>();
             for (Rec r : all) {
-                if (r.text != null && !r.text.trim().isEmpty()) {
+                if (r.visible && r.text != null && !r.text.trim().isEmpty()) {
                     out.add(r.text.trim());
-                }
-                if (r.desc != null && !r.desc.trim().isEmpty()) {
-                    out.add(r.desc.trim());
                 }
             }
             return out;
@@ -370,8 +358,8 @@ final class BarcodeRunner {
         List<Found> fs = s.founds(order);
         sb.append("Görünen barkodlar: ").append(fs.size()).append('\n');
         for (Found f : fs) {
-            sb.append("  ").append(f.code).append("  okutuldu işareti: ")
-                    .append(s.scanned(f) ? "var" : "yok").append('\n');
+            sb.append("  ").append(f.code).append("  kart içi düğüm sayısı: ")
+                    .append(s.cardNodes(f)).append('\n');
         }
         Rec e = s.findEdit();
         sb.append("Yazma alanı: ").append(e == null ? "YOK" : e.cls + " id=" + e.id).append('\n');
@@ -565,7 +553,8 @@ final class BarcodeRunner {
                         WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
                         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                         PixelFormat.TRANSLUCENT);
-                lp.gravity = Gravity.CENTER;
+                lp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+                lp.y = (int) (dm.heightPixels * 0.30f);
                 try {
                     wm.addView(box, lp);
                     panel = box;
@@ -712,11 +701,11 @@ final class BarcodeRunner {
         return !needScreen().signature(order).equals(sig0);
     }
 
-    private void collect(Snapshot s, String order, Map<String, Boolean> found) {
+    private void collect(Snapshot s, String order, Map<String, Integer> found) {
         for (Found f : s.founds(order)) {
-            Boolean old = found.get(f.code);
-            boolean sc = s.scanned(f);
-            found.put(f.code, (old != null && old) || sc);
+            Integer old = found.get(f.code);
+            int n = s.cardNodes(f);
+            found.put(f.code, old == null ? n : Math.max(old, n));
         }
     }
 
@@ -724,7 +713,7 @@ final class BarcodeRunner {
         long end = System.currentTimeMillis() + 3500;
         while (System.currentTimeMillis() < end) {
             Snapshot s = snap();
-            if (s != null && !s.hasText("barkod tarandı")) {
+            if (s != null && !s.hasVisibleText("barkod tarandı")) {
                 return;
             }
             sleep(250);
@@ -737,7 +726,7 @@ final class BarcodeRunner {
         while (System.currentTimeMillis() < end) {
             sleep(200);
             Snapshot s = snap();
-            if (s != null && s.hasText("barkod tarandı")) {
+            if (s != null && s.hasVisibleText("barkod tarandı")) {
                 return true;
             }
         }
@@ -792,7 +781,7 @@ final class BarcodeRunner {
         }
 
         // 2) Başından sonuna kaydırarak tüm barkodları topla
-        Map<String, Boolean> found = new LinkedHashMap<>();
+        Map<String, Integer> found = new LinkedHashMap<>();
         collect(needScreen(), order, found);
         for (int i = 0; i < 40; i++) {
             if (!scrollStep(true, order)) {
@@ -818,16 +807,24 @@ final class BarcodeRunner {
                 modalCount = e.getValue();
             }
         }
+        // Okutulmuş kartta tik ek bir görsel öğe olduğu için sayı fazla çıkar: en azı "okutulmamış"
+        int baseline = Integer.MAX_VALUE;
+        for (Map.Entry<String, Integer> e : found.entrySet()) {
+            if (e.getKey().length() == modal && e.getValue() >= 0 && e.getValue() < baseline) {
+                baseline = e.getValue();
+            }
+        }
         int skipped = 0;
         List<String> all = new ArrayList<>();
         List<String> pending = new ArrayList<>();
-        for (Map.Entry<String, Boolean> e : found.entrySet()) {
+        for (Map.Entry<String, Integer> e : found.entrySet()) {
             if (e.getKey().length() != modal) {
                 skipped++;
                 continue;
             }
             all.add(e.getKey());
-            if (!e.getValue()) {
+            boolean scanned = baseline != Integer.MAX_VALUE && e.getValue() > baseline;
+            if (!scanned) {
                 pending.add(e.getKey());
             }
         }
