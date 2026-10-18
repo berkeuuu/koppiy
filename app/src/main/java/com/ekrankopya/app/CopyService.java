@@ -93,6 +93,7 @@ public class CopyService extends AccessibilityService {
     private boolean hiddenForApp;
     private String currentPkg;
     private final Map<String, Boolean> gameCache = new HashMap<>();
+    private BarcodeRunner barcode;
 
     // Seçim ekranı
     private FrameLayout overlay;
@@ -470,6 +471,12 @@ public class CopyService extends AccessibilityService {
             toast(R.string.toast_read_fail);
             return;
         }
+        if (handleSpecial(root)) {
+            if (Build.VERSION.SDK_INT < 33) {
+                root.recycle();
+            }
+            return;
+        }
         items.clear();
         seen.clear();
         boolean showAllDesc = prefs.getBoolean(Prefs.ALL_DESC, false);
@@ -494,6 +501,38 @@ public class CopyService extends AccessibilityService {
             }
         });
         buildOverlay();
+    }
+
+    /**
+     * Özel durumlar: tek seferlik "Ekranı incele" dökümü ve Migpack barkod modu.
+     * true dönerse normal seçim ekranı açılmaz.
+     */
+    private boolean handleSpecial(AccessibilityNodeInfo root) {
+        if (barcode != null && barcode.isRunning()) {
+            return true;
+        }
+        if (prefs.getBoolean(Prefs.BARCODE_DEBUG, false)) {
+            prefs.edit().putBoolean(Prefs.BARCODE_DEBUG, false).apply();
+            String text;
+            try {
+                text = BarcodeRunner.dump(root);
+            } catch (Exception e) {
+                text = "Döküm alınamadı: " + e;
+            }
+            if (text.length() > 90000) {
+                text = text.substring(0, 90000);
+            }
+            ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            cm.setPrimaryClip(ClipData.newPlainText("Koppiy ekran dökümü", text));
+            toast(R.string.toast_dump_copied);
+            return true;
+        }
+        if (prefs.getBoolean(Prefs.BARCODE, false) && BarcodeRunner.looksLikeBarcodeScreen(root)) {
+            barcode = new BarcodeRunner(this, wm);
+            barcode.start();
+            return true;
+        }
+        return false;
     }
 
     private void collect(AccessibilityNodeInfo node, boolean showAllDesc) {

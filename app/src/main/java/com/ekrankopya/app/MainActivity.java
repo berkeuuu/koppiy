@@ -542,6 +542,18 @@ public class MainActivity extends Activity {
         addSwitch(beh, R.string.set_all_desc, Prefs.ALL_DESC, false);
         content.addView(beh);
 
+        content.addView(heading(R.string.set_barcode));
+        LinearLayout bar = card();
+        addSwitch(bar, R.string.set_barcode_on, Prefs.BARCODE, false);
+        TextView bh = text(getString(R.string.set_barcode_hint), 13, 0xFF777788, false);
+        bh.setPadding(0, 0, 0, Util.dp(this, 6));
+        bar.addView(bh);
+        addSwitch(bar, R.string.set_barcode_ask, Prefs.BARCODE_ASK, true);
+        addSwitch(bar, R.string.set_barcode_debug, Prefs.BARCODE_DEBUG, false);
+        TextView dh = text(getString(R.string.set_barcode_debug_hint), 13, 0xFF777788, false);
+        bar.addView(dh);
+        content.addView(bar);
+
         content.addView(heading(R.string.set_hidden));
         LinearLayout hid = card();
         TextView hint = text(getString(R.string.set_hidden_hint), 13, 0xFF777788, false);

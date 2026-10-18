@@ -38,6 +38,11 @@ final class Prefs {
     static final String BUBBLE_X = "bubble_x";
     static final String BUBBLE_Y = "bubble_y";
     static final String HIDDEN_APPS = "hidden_apps";
+    /** Barkod modu (Migpack): açık/kapalı, bitirmeden önce sor, tek seferlik ekran incelemesi. */
+    static final String BARCODE = "barcode_mode";
+    static final String BARCODE_ASK = "barcode_ask_finish";
+    static final String BARCODE_DEBUG = "barcode_debug";
+
     static final String WIZARD_DONE = "wizard_done";
 
     /** Sihirbazda elle "Yaptım" denen adımlar: STEP_PREFIX + adım kimliği. */

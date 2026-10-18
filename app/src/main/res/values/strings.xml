@@ -91,4 +91,12 @@
 
     <string name="edit_title">Metni düzenle</string>
     <string name="tile_label">Koppiy</string>
+
+    <string name="toast_dump_copied">Ekran bilgisi kopyalandı. Sohbete yapıştırıp gönderebilirsin.</string>
+    <string name="set_barcode">Barkod (Migpack)</string>
+    <string name="set_barcode_on">Barkod modu</string>
+    <string name="set_barcode_hint">Migpack\'te \"Okutmanız Gereken Barkodlar\" ekranındayken Koppiy düğmesine dokununca barkodları okuyup tek tek ekler. Donuk çantası gibi uyarıları asla kendisi onaylamaz.</string>
+    <string name="set_barcode_ask">Teslim almayı bitirmeden önce sor</string>
+    <string name="set_barcode_debug">Ekranı incele (bir kez)</string>
+    <string name="set_barcode_debug_hint">Açıkken bir sonraki dokunuşta o ekranın bilgisi kopyalanır (barkod modu çalışmaz). Sorun olursa bunu bana gönder. Ekrandaki yazıları içerir, göndermeden önce bak.</string>
 </resources>
