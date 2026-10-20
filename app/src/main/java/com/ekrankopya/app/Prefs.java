@@ -40,6 +40,8 @@ final class Prefs {
     static final String HIDDEN_APPS = "hidden_apps";
     /** Barkod modu (Migpack): açık/kapalı, bitirmeden önce sor, tek seferlik ekran incelemesi. */
     static final String BARCODE = "barcode_mode";
+    static final String BARCODE_AUTO_CONFIRM = "barcode_auto_confirm";
+    static final String BARCODE_ASK_ADD = "barcode_ask_add";
     static final String BARCODE_ASK = "barcode_ask_finish";
     static final String BARCODE_DEBUG = "barcode_debug";
 

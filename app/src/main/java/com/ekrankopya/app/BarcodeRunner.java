@@ -304,6 +304,33 @@ final class BarcodeRunner {
         }
 
         /** Ekranda görünen yazılar (iç kimlik gibi açıklamalar hariç). */
+        /** Yeni çıkmış (before'da olmayan) görünür yazılar. */
+        List<String> freshTexts(Set<String> before) {
+            List<String> out = new ArrayList<>();
+            for (String l : labels()) {
+                if (!before.contains(l) && !lower(l).contains("barkod tarandı") && !l.matches("[\\d\\s]*")) {
+                    out.add(l);
+                }
+            }
+            return out;
+        }
+
+        /** Yeni çıkmış bir düğme: yazısı izin verilen kelimelerden biri olan (örn. "evet"). */
+        Rec findNewButton(Set<String> before, String... allowedLower) {
+            for (Rec r : all) {
+                if (!r.visible || r.text == null || before.contains(r.text.trim())) {
+                    continue;
+                }
+                String t = lower(r.text).trim();
+                for (String a : allowedLower) {
+                    if (t.equals(a)) {
+                        return r;
+                    }
+                }
+            }
+            return null;
+        }
+
         Set<String> labels() {
             Set<String> out = new HashSet<>();
             for (Rec r : all) {
@@ -845,9 +872,12 @@ final class BarcodeRunner {
             finishStage(msg.toString());
             return;
         }
-        msg.append(" ").append(pending.size()).append(" tanesi eklensin mi?");
-        if (!ask(msg.toString(), "Ekle", "İptal")) {
-            throw new Fail("Eklemedim.");
+        // Ayar kapalıysa sormadan ekler. Ama bazı barkodlar tam okunamadıysa yine de sorar.
+        if (prefs.getBoolean(Prefs.BARCODE_ASK_ADD, false) || skipped > 0) {
+            msg.append(" ").append(pending.size()).append(" tanesi eklensin mi?");
+            if (!ask(msg.toString(), "Ekle", "İptal")) {
+                throw new Fail("Eklemedim.");
+            }
         }
 
         // 4) Tek tek ekle
@@ -875,7 +905,7 @@ final class BarcodeRunner {
     }
 
     private void finishStage(String done) {
-        boolean askFinish = prefs.getBoolean(Prefs.BARCODE_ASK, true);
+        boolean askFinish = prefs.getBoolean(Prefs.BARCODE_ASK, false);
         if (askFinish) {
             if (!ask(done + " Teslim almayı bitirelim mi?", "Bitir", "Hayır")) {
                 end(done + " Bitirmedim.");
@@ -892,31 +922,47 @@ final class BarcodeRunner {
         if (!click(btn)) {
             throw new Fail("\"Teslim Almayı Bitir\" düğmesine basamadım.");
         }
-        for (int i = 0; i < 12; i++) {
+        boolean autoConfirm = prefs.getBoolean(Prefs.BARCODE_AUTO_CONFIRM, false);
+        boolean confirmed = false;
+        for (int i = 0; i < 14; i++) {
             sleep(400);
             Snapshot n = snap();
             if (n == null) {
                 continue;
             }
             if (!n.isBarcodeScreen()) {
-                end("Teslim alma bitti.");
+                hidePanel();
                 return;
             }
-            // Yeni çıkan yazı varsa (örn. donuk çantası uyarısı) onu göster, ASLA onaylama.
-            StringBuilder fresh = new StringBuilder();
-            for (String l : n.labels()) {
-                if (!before.contains(l) && !lower(l).contains("barkod tarandı") && !l.matches("[\\d\\s]*")) {
-                    if (fresh.length() > 0) {
-                        fresh.append(" / ");
-                    }
-                    fresh.append(l.replace('\n', ' '));
+            List<String> fresh = n.freshTexts(before);
+            if (fresh.isEmpty()) {
+                continue;
+            }
+            // Mağaza onay sorusu ("paketi sorunsuz aldınız mı"): ayar açıksa Evet der.
+            // Donuk çantası uyarısına ASLA dokunmaz, o onay her zaman kullanıcıda.
+            StringBuilder sb = new StringBuilder();
+            for (String f : fresh) {
+                sb.append(lower(f)).append(' ');
+            }
+            String joined = sb.toString();
+            if (autoConfirm && !confirmed && joined.contains("sorunsuz")
+                    && !joined.contains("donuk") && !joined.contains("çanta")) {
+                Rec yes = n.findNewButton(before, "evet", "onaylıyorum", "onayla", "evet, onaylıyorum");
+                if (yes != null && click(yes)) {
+                    confirmed = true;
+                    sleep(700);
+                    Snapshot after = snap();
+                    before = after == null ? n.labels() : after.labels();
+                    continue;
                 }
             }
-            if (fresh.length() > 0) {
-                String f = fresh.length() > 200 ? fresh.substring(0, 200) + "…" : fresh.toString();
-                end("Uygulama bir uyarı gösterdi: “" + f + "”\nOnay sende, ben dokunmadım.");
-                return;
-            }
+            // Uygulamanın kendi sorusu/uyarısı çıktı: onay kullanıcıda, sessizce çekil.
+            hidePanel();
+            return;
+        }
+        if (confirmed) {
+            hidePanel();
+            return;
         }
         end("Bitir'e bastım ama ekranda değişiklik göremedim. Kontrol et.");
     }
