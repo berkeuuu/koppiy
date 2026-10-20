@@ -96,6 +96,9 @@
     <string name="set_barcode">Barkod (Migpack)</string>
     <string name="set_barcode_on">Barkod modu</string>
     <string name="set_barcode_hint">Migpack\'te \"Okutmanız Gereken Barkodlar\" ekranındayken Koppiy düğmesine dokununca barkodları okuyup tek tek ekler. Donuk çantası gibi uyarıları asla kendisi onaylamaz.</string>
+    <string name="set_barcode_ask_add">Barkodları eklemeden önce sor</string>
+    <string name="set_barcode_auto">Mağaza onay sorusunu otomatik onayla</string>
+    <string name="set_barcode_auto_hint">Bitir\'e basınca çıkan "paketi mağazadan sorunsuz aldınız mı" sorusuna Evet der. Donuk çantası uyarısına hiçbir zaman dokunmaz, onu sen onaylarsın. Açmadan önce paketleri kontrol ettiğinden emin ol.</string>
     <string name="set_barcode_ask">Teslim almayı bitirmeden önce sor</string>
     <string name="set_barcode_debug">Ekranı incele (bir kez)</string>
     <string name="set_barcode_debug_hint">Açıkken bir sonraki dokunuşta o ekranın bilgisi kopyalanır (barkod modu çalışmaz). Sorun olursa bunu bana gönder. Ekrandaki yazıları içerir, göndermeden önce bak.</string>
